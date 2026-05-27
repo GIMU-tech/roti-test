@@ -1,0 +1,1222 @@
+<!doctype html>
+<html lang="ko"><head><script data-od-sandbox-shim="">(function(){
+  function makeStore(){
+    var data = {};
+    var api = {
+      getItem: function(k){ return Object.prototype.hasOwnProperty.call(data, k) ? data[k] : null; },
+      setItem: function(k, v){ data[k] = String(v); },
+      removeItem: function(k){ delete data[k]; },
+      clear: function(){ data = {}; },
+      key: function(i){ return Object.keys(data)[i] || null; }
+    };
+    Object.defineProperty(api, 'length', { get: function(){ return Object.keys(data).length; } });
+    return api;
+  }
+  function tryShim(name){
+    var works = false;
+    try { works = !!window[name] && typeof window[name].getItem === 'function'; void window[name].length; }
+    catch (_) { works = false; }
+    if (works) return;
+    try { Object.defineProperty(window, name, { configurable: true, value: makeStore() }); }
+    catch (_) { try { window[name] = makeStore(); } catch (__) {} }
+  }
+  tryShim('localStorage');
+  tryShim('sessionStorage');
+  document.addEventListener('click', (e) => {
+    if (!e.target || !(e.target instanceof Element)) return;
+    var link = e.target.closest('a[href]');
+    if (!link) return;
+    var href = link.getAttribute('href');
+    if (href === null) return;
+    var isAnchor = href.startsWith('#') || href === '';
+    if (isAnchor) {
+      e.preventDefault();
+      if (href === '' || href === '#') {
+        window.scrollTo({ top: 0 });
+        history.replaceState(null, '', ' ');
+      } else {
+        var targetId = href.slice(1);
+        var target = targetId ? document.getElementById(targetId) : null;
+        if (target) {
+          target.scrollIntoView();
+          location.hash === href && history.replaceState(null, '', ' ');
+          location.hash = href;
+        }
+      }
+    } else if (link.getAttribute('target') === '_blank') {
+      e.preventDefault();
+      let safe = false;
+      try {
+        var url = new URL(href, location.href);
+        safe =
+          url.protocol === 'http:' ||
+          url.protocol === 'https:' ||
+          url.protocol === 'mailto:';
+      } catch (_) {}
+      safe && window.open(href, '_blank', 'noopener,noreferrer');
+    }
+  });
+})();</script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>로티 · 르엘코리아 · 지앤글로벌 | 브랜드 통합관</title>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #ffffff;
+      --surface-warm: var(--surface);
+      --fg: #111111;
+      --fg-2: var(--fg);
+      --muted: #6b6b6b;
+      --meta: var(--muted);
+      --border: #e5e5e5;
+      --border-soft: var(--border);
+      --accent: #2f6feb;
+      --accent-on: #ffffff;
+      --accent-hover: color-mix(in oklab, var(--accent), black 8%);
+      --accent-active: color-mix(in oklab, var(--accent), black 14%);
+      --success: #17a34a;
+      --warn: #eab308;
+      --danger: #dc2626;
+      --font-display: "Inter", -apple-system, system-ui, sans-serif;
+      --font-body: "Inter", -apple-system, system-ui, sans-serif;
+      --font-mono: ui-monospace, "JetBrains Mono", monospace;
+      --text-xs: 12px;
+      --text-sm: 14px;
+      --text-base: 16px;
+      --text-lg: 20px;
+      --text-xl: 24px;
+      --text-2xl: 32px;
+      --text-3xl: 48px;
+      --text-4xl: 64px;
+      --leading-body: 1.5;
+      --leading-tight: 1.2;
+      --tracking-display: -0.01em;
+      --space-1: 4px;
+      --space-2: 8px;
+      --space-3: 12px;
+      --space-4: 16px;
+      --space-5: 20px;
+      --space-6: 24px;
+      --space-8: 32px;
+      --space-12: 48px;
+      --space-20: 80px;
+      --section-y-desktop: 80px;
+      --section-y-tablet: 48px;
+      --section-y-phone: 32px;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-pill: 9999px;
+      --elev-flat: none;
+      --elev-ring: 0 0 0 1px var(--border);
+      --elev-raised: 0 2px 8px color-mix(in oklab, var(--fg), transparent 92%);
+      --focus-ring: 0 0 0 3px color-mix(in oklab, var(--accent), transparent 70%);
+      --motion-fast: 150ms;
+      --motion-base: 200ms;
+      --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+      --container-max: 1200px;
+      --container-gutter-desktop: 24px;
+      --container-gutter-tablet: 16px;
+      --container-gutter-phone: 12px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      font-size: var(--text-base);
+      line-height: var(--leading-body);
+      text-rendering: optimizeLegibility;
+      -webkit-font-smoothing: antialiased;
+    }
+    a { color: inherit; text-decoration: none; }
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+    p, ul, figure { margin: 0; }
+    h1, h2, h3 {
+      margin: 0;
+      font-family: var(--font-display);
+      line-height: var(--leading-tight);
+      letter-spacing: var(--tracking-display);
+      text-wrap: balance;
+    }
+    h1 { font-size: clamp(42px, 6vw, var(--text-4xl)); max-width: 790px; }
+    h2 { font-size: clamp(30px, 4vw, var(--text-3xl)); max-width: 760px; }
+    h3 { font-size: var(--text-xl); }
+    p { text-wrap: pretty; }
+
+    .container {
+      width: min(100%, var(--container-max));
+      margin-inline: auto;
+      padding-inline: var(--container-gutter-desktop);
+    }
+    .section { padding-block: var(--section-y-desktop); }
+    .section + .section { border-top: 1px solid var(--border); }
+    .eyebrow {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      letter-spacing: 0;
+      margin-bottom: var(--space-4);
+      text-transform: uppercase;
+    }
+    .lead { color: var(--muted); font-size: var(--text-lg); max-width: 680px; }
+    .muted { color: var(--muted); }
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid var(--border);
+      background: color-mix(in oklab, var(--bg), transparent 5%);
+      backdrop-filter: blur(18px);
+    }
+    .topbar-inner {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-5);
+    }
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      font-weight: 700;
+      letter-spacing: var(--tracking-display);
+    }
+    .logo-mark {
+      width: 36px;
+      height: 36px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      font-family: var(--font-mono);
+      font-size: var(--text-sm);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: var(--space-6);
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+    .nav a:hover { color: var(--fg); }
+    .btn {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-2);
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      padding: 10px 16px;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      transition:
+        background var(--motion-fast) var(--ease-standard),
+        border-color var(--motion-fast) var(--ease-standard),
+        transform var(--motion-fast) var(--ease-standard);
+    }
+    .btn:focus-visible,
+    .field-input:focus-visible,
+    .brand-button:focus-visible,
+    .inquiry-option:focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-on); }
+    .btn-primary:hover { background: var(--accent-hover); }
+    .btn-secondary { background: var(--surface); border-color: var(--border); color: var(--fg); }
+    .btn-secondary:hover { border-color: var(--fg); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: var(--space-5);
+    }
+
+    .hero { padding-block: clamp(76px, 10vw, 136px); }
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+      gap: clamp(var(--space-8), 5vw, var(--space-20));
+      align-items: center;
+    }
+    .hero h1 { margin-bottom: var(--space-5); }
+    .hero .lead { margin-bottom: var(--space-8); }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); }
+    .trust-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-3);
+      margin-top: var(--space-8);
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+    .trust-strip span {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      background: color-mix(in oklab, var(--surface), transparent 12%);
+      padding: 7px 11px;
+    }
+    .trust-strip span::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: var(--radius-pill);
+      background: var(--success);
+    }
+
+    .visual-stage {
+      position: relative;
+      min-height: 560px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      overflow: hidden;
+      box-shadow: var(--elev-raised);
+    }
+    .visual-stage::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, color-mix(in oklab, var(--border), transparent 62%) 1px, transparent 1px),
+        linear-gradient(0deg, color-mix(in oklab, var(--border), transparent 62%) 1px, transparent 1px);
+      background-size: 42px 42px;
+      opacity: 0.42;
+      pointer-events: none;
+    }
+    .photo-card {
+      position: absolute;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(145deg, color-mix(in oklab, var(--surface), var(--accent) 8%), var(--surface));
+      overflow: hidden;
+      box-shadow: var(--elev-raised);
+    }
+    .photo-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(circle at 26% 20%, color-mix(in oklab, var(--accent), transparent 70%), transparent 28%),
+        linear-gradient(135deg, transparent 0 42%, color-mix(in oklab, var(--fg), transparent 94%) 42% 58%, transparent 58%);
+      opacity: 0.9;
+    }
+    .photo-card::after {
+      content: "";
+      position: absolute;
+      inset: auto 22px 22px 22px;
+      height: 58px;
+      border-radius: var(--radius-sm);
+      background:
+        linear-gradient(90deg, var(--surface), color-mix(in oklab, var(--surface), var(--accent) 6%));
+      border: 1px solid var(--border);
+    }
+    .photo-main {
+      left: 34px;
+      top: 42px;
+      width: 62%;
+      height: 66%;
+    }
+    .photo-side {
+      right: 34px;
+      top: 86px;
+      width: 34%;
+      height: 42%;
+    }
+    .photo-bottom {
+      right: 54px;
+      bottom: 44px;
+      width: 48%;
+      height: 28%;
+    }
+    .brand-chip {
+      position: absolute;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      background: var(--surface);
+      padding: 8px 12px;
+      font-size: var(--text-sm);
+      font-weight: 700;
+      box-shadow: var(--elev-raised);
+    }
+    .brand-chip i {
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-pill);
+      background: color-mix(in oklab, var(--fg), transparent 95%);
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-style: normal;
+      font-size: var(--text-xs);
+    }
+    .chip-loti { left: 54px; bottom: 94px; }
+    .chip-reel { right: 52px; top: 44px; }
+    .chip-global { right: 78px; bottom: 190px; }
+    .stage-caption {
+      position: absolute;
+      left: 34px;
+      right: 34px;
+      bottom: 28px;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+    .stage-caption strong { color: var(--fg); }
+
+    .section-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: var(--space-8);
+      margin-bottom: var(--space-12);
+    }
+    .section-head .lead { margin-top: var(--space-4); }
+    .brand-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: var(--space-5);
+    }
+    .brand-card {
+      min-height: 520px;
+      display: flex;
+      flex-direction: column;
+      padding: 0;
+      overflow: hidden;
+    }
+    .brand-image {
+      position: relative;
+      min-height: 260px;
+      border-bottom: 1px solid var(--border);
+      background:
+        linear-gradient(145deg, color-mix(in oklab, var(--accent), transparent 90%), var(--surface));
+      overflow: hidden;
+    }
+    .brand-image::before {
+      content: "";
+      position: absolute;
+      inset: 28px;
+      border: 1px solid color-mix(in oklab, var(--border), transparent 12%);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(135deg, transparent 0 38%, color-mix(in oklab, var(--fg), transparent 93%) 38% 45%, transparent 45%),
+        radial-gradient(circle at 68% 26%, color-mix(in oklab, var(--accent), transparent 72%), transparent 24%),
+        var(--surface);
+      box-shadow: var(--elev-raised);
+    }
+    .brand-image::after {
+      content: "";
+      position: absolute;
+      left: 50px;
+      right: 50px;
+      bottom: 46px;
+      height: 46px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+    }
+    .brand-image .monogram {
+      position: absolute;
+      left: 28px;
+      top: 24px;
+      z-index: 1;
+      width: 52px;
+      height: 52px;
+      display: grid;
+      place-items: center;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+    }
+    .brand-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: var(--space-6);
+      padding: var(--space-6);
+    }
+    .brand-meta {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+      margin-bottom: var(--space-3);
+      text-transform: uppercase;
+    }
+    .brand-body p { color: var(--muted); margin-top: var(--space-3); }
+    .brand-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2);
+      padding: 0;
+      list-style: none;
+    }
+    .brand-tags li {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      color: var(--muted);
+      font-size: var(--text-sm);
+      padding: 5px 10px;
+    }
+
+    .finder {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+      gap: var(--space-12);
+      align-items: stretch;
+    }
+    .inquiry-options {
+      display: grid;
+      gap: var(--space-3);
+      margin-top: var(--space-8);
+    }
+    .inquiry-option {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: var(--space-4);
+      align-items: start;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      color: var(--fg);
+      padding: var(--space-5);
+      text-align: left;
+      transition:
+        border-color var(--motion-fast) var(--ease-standard),
+        background var(--motion-fast) var(--ease-standard);
+    }
+    .inquiry-option:hover,
+    .inquiry-option[aria-pressed="true"] {
+      border-color: var(--accent);
+      background: color-mix(in oklab, var(--accent), transparent 95%);
+    }
+    .inquiry-option .num {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+    .inquiry-option p { color: var(--muted); margin-top: var(--space-1); }
+
+    .form-card {
+      padding: var(--space-8);
+      box-shadow: var(--elev-raised);
+    }
+    .form-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-4);
+      margin-bottom: var(--space-6);
+    }
+    .selected-brand {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-pill);
+      color: var(--muted);
+      font-size: var(--text-sm);
+      padding: 6px 10px;
+      white-space: nowrap;
+    }
+    .form {
+      display: grid;
+      gap: var(--space-4);
+    }
+    .field {
+      display: grid;
+      gap: var(--space-2);
+    }
+    .field label {
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+    .field-input {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--fg);
+      padding: 11px 12px;
+    }
+    textarea.field-input {
+      min-height: 132px;
+      resize: vertical;
+    }
+    .two-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-4);
+    }
+    .form-status {
+      min-height: 24px;
+      color: var(--success);
+      font-size: var(--text-sm);
+    }
+
+    .proof-grid {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: var(--space-12);
+      align-items: start;
+    }
+    .proof-list {
+      display: grid;
+      gap: var(--space-4);
+    }
+    .proof-item {
+      display: grid;
+      grid-template-columns: 42px 1fr;
+      gap: var(--space-4);
+      padding-bottom: var(--space-5);
+      border-bottom: 1px solid var(--border);
+    }
+    .proof-icon {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background: var(--surface);
+      color: var(--fg);
+      font-weight: 800;
+    }
+    .proof-item p { color: var(--muted); margin-top: var(--space-1); }
+    .catalog-panel {
+      min-height: 430px;
+      position: relative;
+      overflow: hidden;
+      background: var(--surface);
+    }
+    .catalog-panel::before {
+      content: "";
+      position: absolute;
+      inset: 28px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background:
+        linear-gradient(90deg, var(--surface) 0 52%, color-mix(in oklab, var(--accent), transparent 94%) 52%),
+        var(--surface);
+    }
+    .catalog-row {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: 92px 1fr auto;
+      gap: var(--space-4);
+      align-items: center;
+      margin: var(--space-6);
+      padding: var(--space-4);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      background: var(--surface);
+      box-shadow: var(--elev-raised);
+    }
+    .catalog-thumb {
+      height: 70px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      background:
+        radial-gradient(circle at 66% 30%, color-mix(in oklab, var(--accent), transparent 76%), transparent 26%),
+        linear-gradient(135deg, color-mix(in oklab, var(--fg), transparent 96%), var(--surface));
+    }
+    .catalog-row strong { display: block; }
+    .catalog-row span { color: var(--muted); font-size: var(--text-sm); }
+    .catalog-row em {
+      color: var(--muted);
+      font-style: normal;
+      font-family: var(--font-mono);
+      font-size: var(--text-xs);
+    }
+
+    .footer {
+      border-top: 1px solid var(--border);
+      padding-block: var(--space-8);
+      color: var(--muted);
+      font-size: var(--text-sm);
+    }
+    .footer-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--space-5);
+    }
+    .footer-links {
+      display: flex;
+      gap: var(--space-5);
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 1023px) {
+      .container { padding-inline: var(--container-gutter-tablet); }
+      .section { padding-block: var(--section-y-tablet); }
+      .hero-grid,
+      .finder,
+      .proof-grid {
+        grid-template-columns: 1fr;
+      }
+      .brand-grid { grid-template-columns: 1fr; }
+      .visual-stage { min-height: 500px; }
+      .section-head { display: block; }
+    }
+    @media (max-width: 760px) {
+      .nav, .topbar .btn-secondary { display: none; }
+      .container { padding-inline: var(--container-gutter-phone); }
+      .section { padding-block: var(--section-y-phone); }
+      .hero { padding-block: var(--space-12); }
+      .hero-actions, .hero-actions .btn { width: 100%; }
+      .visual-stage { min-height: 420px; }
+      .photo-main { left: 18px; top: 34px; width: 76%; height: 54%; }
+      .photo-side { right: 18px; top: 74px; width: 42%; height: 34%; }
+      .photo-bottom { right: 22px; bottom: 78px; width: 68%; height: 25%; }
+      .chip-loti { left: 24px; bottom: 132px; }
+      .chip-reel { right: 20px; top: 22px; }
+      .chip-global { right: 28px; bottom: 208px; }
+      .stage-caption {
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+        align-items: flex-start;
+        flex-direction: column;
+      }
+      .two-fields,
+      .catalog-row {
+        grid-template-columns: 1fr;
+      }
+      .form-card { padding: var(--space-5); }
+      .footer-row { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+<style data-od-tweaks-bridge-style="">
+[data-od-tweaks-hidden] .tw-panel {
+  transform: translateX(calc(100% + 32px)) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+.tw-restore { display: none !important; }
+</style><script data-od-tweaks-bridge="">(function(){
+  // Synchronously hide BEFORE the artifact body parses so the panel never
+  // flashes on initial paint. The host removes the attribute via postMessage
+  // once it knows the desired state.
+  document.documentElement.setAttribute('data-od-tweaks-hidden', '');
+
+  var suppressEcho = false;
+  var observer = null;
+
+  function panelEl(){ return document.querySelector('.tw-panel'); }
+
+  function applyClassesToPanel(visible){
+    var panel = panelEl();
+    if (panel) panel.classList.toggle('tw-hidden', !visible);
+  }
+
+  function setPanelVisible(visible){
+    suppressEcho = true;
+    document.documentElement.toggleAttribute('data-od-tweaks-hidden', !visible);
+    applyClassesToPanel(visible);
+    // Clear flag after the MutationObserver has had a chance to fire for this
+    // change so we don't echo our own host-driven toggles back to the host.
+    Promise.resolve().then(function(){ suppressEcho = false; });
+  }
+
+  function postState(){
+    var panel = panelEl();
+    if (!panel) return;
+    try {
+      parent.postMessage({
+        type: 'od:tweaks-panel-state',
+        visible: !panel.classList.contains('tw-hidden'),
+      }, '*');
+    } catch (e) {}
+  }
+
+  function postAvailability(){
+    try {
+      parent.postMessage({
+        type: 'od:tweaks-available',
+        available: !!panelEl(),
+      }, '*');
+    } catch (e) {}
+  }
+
+  function attachObserver(){
+    var panel = panelEl();
+    if (!panel || observer) return;
+    observer = new MutationObserver(function(){
+      if (suppressEcho) return;
+      postState();
+    });
+    observer.observe(panel, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  function onReady(){
+    // Capture the panel authored visibility BEFORE we apply the host hidden
+    // attribute. The bridge sets data-od-tweaks-hidden synchronously in head
+    // (before the body parses), so on entry to onReady the attribute is
+    // always present even though the artifact may have authored the panel
+    // as default-visible. Reading the panel class first is the only place
+    // we can still observe the author intent. Then drive the attribute,
+    // classes, and posted state from that captured value so a default
+    // visible tw-panel reports visible:true and the toolbar toggle starts
+    // ON. Issue surfaced in PR #1643 review.
+    var panel = panelEl();
+    var initialVisible = !!panel && !panel.classList.contains('tw-hidden');
+    document.documentElement.toggleAttribute('data-od-tweaks-hidden', !initialVisible);
+    applyClassesToPanel(initialVisible);
+    attachObserver();
+    postAvailability();
+    // Post the captured initial visibility so the toolbar toggle reflects
+    // the default state on mount. Without this the toggle reads OFF while
+    // a default-visible tw-panel artifact clearly shows its panel and the
+    // user would have to click toggle-on then toggle-off to actually hide.
+    postState();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', onReady);
+  } else {
+    onReady();
+  }
+
+  window.addEventListener('message', function(ev){
+    if (!ev.data || ev.data.type !== 'od:tweaks-panel-visible') return;
+    setPanelVisible(!!ev.data.visible);
+  });
+})();</script></head>
+<body>
+  <header class="topbar" data-od-id="topbar">
+    <div class="container topbar-inner" data-od-id="path-0-0">
+      <a class="brand-logo" href="#top" aria-label="브랜드 통합관 홈" data-od-id="path-0-0-0">
+        <span class="logo-mark">B3</span>
+        <span>브랜드 통합관</span>
+      </a>
+      <nav class="nav" aria-label="주요 메뉴" data-od-id="path-0-0-1">
+        <a href="#brands" data-od-id="path-0-0-1-0">브랜드</a>
+        <a href="#guide" data-od-id="path-0-0-1-1">제품 선택</a>
+        <a href="#contact" data-od-id="path-0-0-1-2">상담 문의</a>
+      </nav>
+      <a class="btn btn-secondary" href="#contact" data-od-id="path-0-0-2">문의하기</a>
+    </div>
+  </header>
+
+  <main id="top" data-od-id="path-1">
+    <section class="section hero" data-od-id="hero">
+      <div class="container hero-grid" data-od-id="path-1-0-0">
+        <div>
+          <p class="eyebrow">LOTI · REEL KOREA · G&amp;GLOBAL</p>
+          <h1 data-od-id="path-1-0-0-0-1">세 브랜드의 제품을 한곳에서 보고, 바로 상담하세요.</h1>
+          <p class="lead">로티, 르엘코리아, 지앤글로벌을 하나의 기준으로 정리해 구매 고객이 제품군을 빠르게 비교하고 필요한 상담으로 이어지도록 만든 통합 홈페이지입니다.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#contact" data-od-id="path-1-0-0-0-3-0">제품 상담 요청</a>
+            <a class="btn btn-secondary" href="#brands" data-od-id="path-1-0-0-0-3-1">브랜드 둘러보기</a>
+          </div>
+          <div class="trust-strip" aria-label="상담 강점">
+            <span>3개 브랜드 통합 접수</span>
+            <span>구매 목적별 상담 분류</span>
+            <span>담당자 연결형 문의 흐름</span>
+          </div>
+        </div>
+
+        <figure class="visual-stage" aria-label="세 브랜드 제품 쇼케이스 이미지">
+          <div class="photo-card photo-main"></div>
+          <div class="photo-card photo-side"></div>
+          <div class="photo-card photo-bottom"></div>
+          <span class="brand-chip chip-loti"><i>L</i>로티</span>
+          <span class="brand-chip chip-reel"><i>R</i>르엘코리아</span>
+          <span class="brand-chip chip-global"><i>G</i>지앤글로벌</span>
+          <figcaption class="stage-caption">
+            <strong>Integrated product desk</strong>
+            <span>제품 이미지, 카탈로그, 상담 흐름을 한 화면에서 정리</span>
+          </figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section class="section" id="brands" data-od-id="brands">
+      <div class="container" data-od-id="path-1-1-0">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">BRAND PORTFOLIO</p>
+            <h2 data-od-id="path-1-1-0-0-0-1">동등한 3개 브랜드를 전문적인 카탈로그처럼 보여줍니다.</h2>
+          </div>
+          <p class="lead">각 브랜드는 독립적으로 보이되, 고객 입장에서는 한 번의 탐색과 문의로 이어지도록 구성했습니다.</p>
+        </div>
+
+        <div class="brand-grid">
+          <article class="card brand-card" data-od-id="path-1-1-0-1-0">
+            <div class="brand-image" aria-label="로티 제품 이미지 영역" data-od-id="path-1-1-0-1-0-0">
+              <span class="monogram">L</span>
+            </div>
+            <div class="brand-body" data-od-id="path-1-1-0-1-0-1">
+              <div>
+                <p class="brand-meta">대표 제품 구매 상담</p>
+                <h3 data-od-id="path-1-1-0-1-0-1-0-1">로티</h3>
+                <p>제품 구매를 고민하는 고객에게 가장 먼저 보여줄 대표 브랜드입니다. 제품군, 수량, 납기, 견적 문의를 빠르게 연결합니다.</p>
+              </div>
+              <ul class="brand-tags">
+                <li>제품 문의</li>
+                <li>견적 상담</li>
+                <li>구매 안내</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="card brand-card" data-od-id="path-1-1-0-1-1">
+            <div class="brand-image" aria-label="르엘코리아 제품 이미지 영역" data-od-id="path-1-1-0-1-1-0">
+              <span class="monogram">R</span>
+            </div>
+            <div class="brand-body" data-od-id="path-1-1-0-1-1-1">
+              <div>
+                <p class="brand-meta">제품 비교와 브랜드 안내</p>
+                <h3 data-od-id="path-1-1-0-1-1-1-0-1">르엘코리아</h3>
+                <p>구매 전 제품 차이를 확인하고 싶은 고객에게 브랜드별 특징과 선택 기준을 정리해 주는 상담 진입점입니다.</p>
+              </div>
+              <ul class="brand-tags">
+                <li>라인업 비교</li>
+                <li>제품 선택</li>
+                <li>상담 연결</li>
+              </ul>
+            </div>
+          </article>
+
+          <article class="card brand-card" data-od-id="path-1-1-0-1-2">
+            <div class="brand-image" aria-label="지앤글로벌 제품 이미지 영역" data-od-id="path-1-1-0-1-2-0">
+              <span class="monogram">G</span>
+            </div>
+            <div class="brand-body" data-od-id="path-1-1-0-1-2-1">
+              <div>
+                <p class="brand-meta">유통 및 파트너 상담</p>
+                <h3 data-od-id="path-1-1-0-1-2-1-0-1">지앤글로벌</h3>
+                <p>일반 구매 문의와 분리해 유통, 공급, 파트너십 성격의 상담을 더 명확하게 접수할 수 있도록 돕습니다.</p>
+              </div>
+              <ul class="brand-tags">
+                <li>유통 문의</li>
+                <li>공급 상담</li>
+                <li>파트너십</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="guide" data-od-id="guide">
+      <div class="container finder" data-od-id="path-1-2-0">
+        <div>
+          <p class="eyebrow">PRODUCT GUIDE</p>
+          <h2 data-od-id="path-1-2-0-0-1">어떤 브랜드로 문의해야 할지 몰라도 괜찮습니다.</h2>
+          <p class="lead" style="margin-top: var(--space-4);">고객이 원하는 구매 상황을 선택하면 문의 브랜드와 목적이 자동으로 정리됩니다. 실제 운영에서도 바로 사용할 수 있는 상담 흐름입니다.</p>
+
+          <div class="inquiry-options" aria-label="문의 상황 선택">
+            <button class="inquiry-option" type="button" aria-pressed="true" data-brand="로티" data-purpose="제품 구매 상담" data-od-id="path-1-2-0-0-3-0">
+              <span class="num">01</span>
+              <span><strong>제품을 바로 구매하고 싶어요</strong><p>수량, 납기, 견적을 포함한 구매 상담으로 연결합니다.</p></span>
+            </button>
+            <button class="inquiry-option" type="button" aria-pressed="false" data-brand="르엘코리아" data-purpose="제품 비교 문의" data-od-id="path-1-2-0-0-3-1">
+              <span class="num">02</span>
+              <span><strong>제품 차이를 비교하고 싶어요</strong><p>브랜드별 제품 특징과 선택 기준을 안내합니다.</p></span>
+            </button>
+            <button class="inquiry-option" type="button" aria-pressed="false" data-brand="지앤글로벌" data-purpose="유통/파트너 문의" data-od-id="path-1-2-0-0-3-2">
+              <span class="num">03</span>
+              <span><strong>유통이나 공급 상담이 필요해요</strong><p>사업 성격의 문의를 지앤글로벌 상담으로 분리합니다.</p></span>
+            </button>
+          </div>
+        </div>
+
+        <form class="card form-card" id="inquiryForm" data-od-id="path-1-2-0-1">
+          <div class="form-title" data-od-id="path-1-2-0-1-0">
+            <div>
+              <p class="eyebrow">CONTACT</p>
+              <h3 data-od-id="path-1-2-0-1-0-0-1">제품 상담 요청</h3>
+            </div>
+            <span class="selected-brand" id="selectedBrand" data-od-id="path-1-2-0-1-0-1">로티 선택됨</span>
+          </div>
+
+          <div class="form" data-od-id="path-1-2-0-1-1">
+            <div class="two-fields">
+              <div class="field">
+                <label for="brandSelect">문의 브랜드</label>
+                <select class="field-input" id="brandSelect" name="brand" data-od-id="path-1-2-0-1-1-0-0-1">
+                  <option>로티</option>
+                  <option>르엘코리아</option>
+                  <option>지앤글로벌</option>
+                  <option>아직 모르겠어요</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="purposeSelect">문의 목적</label>
+                <select class="field-input" id="purposeSelect" name="purpose" data-od-id="path-1-2-0-1-1-0-1-1">
+                  <option>제품 구매 상담</option>
+                  <option>제품 비교 문의</option>
+                  <option>유통/파트너 문의</option>
+                  <option>기타 문의</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="two-fields">
+              <div class="field">
+                <label for="nameInput">이름 또는 회사명</label>
+                <input class="field-input" id="nameInput" name="name" autocomplete="name" placeholder="예: 홍길동 / 회사명" data-od-id="path-1-2-0-1-1-1-0-1">
+              </div>
+              <div class="field">
+                <label for="contactInput">연락처</label>
+                <input class="field-input" id="contactInput" name="contact" autocomplete="email" placeholder="이메일 또는 전화번호" data-od-id="path-1-2-0-1-1-1-1-1">
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="messageInput">문의 내용</label>
+              <textarea class="field-input" id="messageInput" name="message" placeholder="찾는 제품, 예상 수량, 구매 시점, 필요한 상담 내용을 적어주세요." data-od-id="path-1-2-0-1-1-2-1"></textarea>
+            </div>
+
+            <button class="btn btn-primary" type="submit" data-od-id="path-1-2-0-1-1-3">상담 요청 확인</button>
+            <p class="form-status" id="formStatus" aria-live="polite" data-od-id="path-1-2-0-1-1-4"></p>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="section" data-od-id="trust">
+      <div class="container proof-grid" data-od-id="path-1-3-0">
+        <div>
+          <p class="eyebrow">PURCHASE SUPPORT</p>
+          <h2 data-od-id="path-1-3-0-0-1">제품 구매 고객이 안심하고 문의할 수 있는 구조입니다.</h2>
+          <p class="lead" style="margin-top: var(--space-4);">브랜드를 먼저 고르지 않아도 구매 목적에 맞춰 상담이 분류되므로, 필요한 제품 정보를 더 빠르게 확인할 수 있습니다.</p>
+        </div>
+
+        <div class="proof-list">
+          <article class="proof-item" data-od-id="path-1-3-0-1-0">
+            <span class="proof-icon">1</span>
+            <div>
+              <h3 data-od-id="path-1-3-0-1-0-1-0">세 브랜드를 한 번에 비교</h3>
+              <p>로티, 르엘코리아, 지앤글로벌의 역할을 같은 기준으로 확인할 수 있습니다.</p>
+            </div>
+          </article>
+          <article class="proof-item" data-od-id="path-1-3-0-1-1">
+            <span class="proof-icon">2</span>
+            <div>
+              <h3 data-od-id="path-1-3-0-1-1-1-0">문의 목적에 맞춘 상담 연결</h3>
+              <p>구매, 제품 비교, 유통 상담을 구분해 처음부터 적합한 담당 흐름으로 접수합니다.</p>
+            </div>
+          </article>
+          <article class="proof-item" data-od-id="path-1-3-0-1-2">
+            <span class="proof-icon">3</span>
+            <div>
+              <h3 data-od-id="path-1-3-0-1-2-1-0">불필요한 확인 절차 감소</h3>
+              <p>제품명, 수량, 일정, 상담 목적을 함께 받아 구매 상담에 필요한 정보를 빠르게 정리합니다.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" data-od-id="catalog">
+      <div class="container" data-od-id="path-1-4-0">
+        <div class="section-head">
+          <div>
+            <p class="eyebrow">PRODUCT CATALOG</p>
+            <h2 data-od-id="path-1-4-0-0-0-1">브랜드별 제품 상담 항목을 카탈로그처럼 정리했습니다.</h2>
+          </div>
+          <p class="lead">구매 고객이 어떤 문의를 남겨야 하는지 바로 판단할 수 있도록 제품 상담 항목을 브랜드별로 나눴습니다.</p>
+        </div>
+
+        <div class="card catalog-panel" aria-label="제품 카탈로그 미리보기">
+          <article class="catalog-row" data-od-id="path-1-4-0-1-0">
+            <div class="catalog-thumb" data-od-id="path-1-4-0-1-0-0"></div>
+            <div><strong>로티 제품 상담 라인</strong><span>구매 목적, 수량, 일정 확인</span></div>
+            <em>LOTI</em>
+          </article>
+          <article class="catalog-row" data-od-id="path-1-4-0-1-1">
+            <div class="catalog-thumb" data-od-id="path-1-4-0-1-1-0"></div>
+            <div><strong>르엘코리아 비교 안내</strong><span>제품 차이, 선택 기준, 상담 분류</span></div>
+            <em>REEL</em>
+          </article>
+          <article class="catalog-row" data-od-id="path-1-4-0-1-2">
+            <div class="catalog-thumb" data-od-id="path-1-4-0-1-2-0"></div>
+            <div><strong>지앤글로벌 공급 문의</strong><span>유통, 공급, 파트너 상담</span></div>
+            <em>GLOBAL</em>
+          </article>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer" data-od-id="footer">
+    <div class="container footer-row" data-od-id="path-2-0">
+      <span>브랜드 통합관 · 로티 · 르엘코리아 · 지앤글로벌</span>
+      <div class="footer-links">
+        <a href="#brands" data-od-id="path-2-0-1-0">브랜드</a>
+        <a href="#guide" data-od-id="path-2-0-1-1">제품 선택</a>
+        <a href="#contact" data-od-id="path-2-0-1-2">상담 문의</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    const options = Array.from(document.querySelectorAll(".inquiry-option"));
+    const brandSelect = document.querySelector("#brandSelect");
+    const purposeSelect = document.querySelector("#purposeSelect");
+    const selectedBrand = document.querySelector("#selectedBrand");
+    const formStatus = document.querySelector("#formStatus");
+
+    function applyInquiry(brand, purpose) {
+      brandSelect.value = brand;
+      purposeSelect.value = purpose;
+      selectedBrand.textContent = `${brand} 선택됨`;
+      options.forEach((option) => {
+        option.setAttribute("aria-pressed", String(option.dataset.brand === brand));
+      });
+    }
+
+    options.forEach((option) => {
+      option.addEventListener("click", () => {
+        applyInquiry(option.dataset.brand, option.dataset.purpose);
+      });
+    });
+
+    brandSelect.addEventListener("change", () => {
+      selectedBrand.textContent = `${brandSelect.value} 선택됨`;
+      options.forEach((option) => {
+        option.setAttribute("aria-pressed", String(option.dataset.brand === brandSelect.value));
+      });
+    });
+
+    document.querySelector("#inquiryForm").addEventListener("submit", (event) => {
+      event.preventDefault();
+      const name = document.querySelector("#nameInput").value.trim();
+      const brand = brandSelect.value;
+      formStatus.textContent = name
+        ? `${name}님의 ${brand} 상담 요청 내용을 확인했습니다.`
+        : `${brand} 상담 요청 내용을 확인했습니다.`;
+    });
+  </script>
+
+
+<script data-od-snapshot-bridge="">(function(){
+  function copyComputedStyle(source, target){
+    if (!source || !target || source.nodeType !== 1 || target.nodeType !== 1) return;
+    var computed = window.getComputedStyle(source);
+    var style = target.getAttribute('style') || '';
+    for (var i = 0; i < computed.length; i++){
+      var prop = computed[i];
+      style += prop + ':' + computed.getPropertyValue(prop) + ';';
+    }
+    target.setAttribute('style', style);
+  }
+  function syncElementState(source, target){
+    var tag = source.tagName ? source.tagName.toLowerCase() : '';
+    if (tag === 'img' && source.currentSrc) target.setAttribute('src', source.currentSrc);
+    if (tag === 'input' || tag === 'textarea') target.setAttribute('value', source.value || '');
+    if (tag === 'canvas') {
+      try {
+        var img = document.createElement('img');
+        img.setAttribute('src', source.toDataURL('image/png'));
+        img.setAttribute('style', target.getAttribute('style') || '');
+        target.parentNode && target.parentNode.replaceChild(img, target);
+      } catch (_) {}
+    }
+  }
+  function inlineSnapshotStyles(originalRoot, cloneRoot){
+    copyComputedStyle(originalRoot, cloneRoot);
+    syncElementState(originalRoot, cloneRoot);
+    var originals = originalRoot.querySelectorAll('*');
+    var clones = cloneRoot.querySelectorAll('*');
+    var count = Math.min(originals.length, clones.length);
+    for (var i = 0; i < count; i++){
+      copyComputedStyle(originals[i], clones[i]);
+      syncElementState(originals[i], clones[i]);
+    }
+    var scripts = cloneRoot.querySelectorAll('script');
+    for (var s = scripts.length - 1; s >= 0; s--) scripts[s].remove();
+  }
+  function waitForImages(){
+    var imgs = Array.prototype.slice.call(document.images || []);
+    return Promise.all(imgs.map(function(img){
+      if (img.complete) return Promise.resolve();
+      return new Promise(function(resolve){
+        img.addEventListener('load', resolve, { once: true });
+        img.addEventListener('error', resolve, { once: true });
+      });
+    }));
+  }
+  function renderSnapshot(id){
+    var w = Math.max(1, window.innerWidth || document.documentElement.clientWidth || 1);
+    var h = Math.max(1, window.innerHeight || document.documentElement.clientHeight || 1);
+    var dpr = window.devicePixelRatio || 1;
+    var docW = Math.max(w, document.documentElement.scrollWidth || 0, document.body ? document.body.scrollWidth : 0);
+    var docH = Math.max(h, document.documentElement.scrollHeight || 0, document.body ? document.body.scrollHeight : 0);
+    var clone = document.documentElement.cloneNode(true);
+    clone.setAttribute('xmlns', 'http://www.w3.org/1999/xhtml');
+    inlineSnapshotStyles(document.documentElement, clone);
+    var serializer = new XMLSerializer();
+    var html = serializer.serializeToString(clone);
+    var svg = '<svg xmlns="http://www.w3.org/2000/svg" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '">' +
+      '<foreignObject x="' + (-window.scrollX || 0) + '" y="' + (-window.scrollY || 0) + '" width="' + docW + '" height="' + docH + '">' +
+      html +
+      '</foreignObject></svg>';
+    var img = new Image();
+    img.onload = function(){
+      try {
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.floor(w * dpr));
+        canvas.height = Math.max(1, Math.floor(h * dpr));
+        var ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('no 2d context');
+        ctx.scale(dpr, dpr);
+        ctx.drawImage(img, 0, 0, w, h);
+        window.parent.postMessage({ type: 'od:snapshot:result', id: id, dataUrl: canvas.toDataURL('image/png'), w: canvas.width, h: canvas.height }, '*');
+      } catch (err) {
+        window.parent.postMessage({ type: 'od:snapshot:result', id: id, error: String(err && err.message || err) }, '*');
+      }
+    };
+    img.onerror = function(){
+      window.parent.postMessage({ type: 'od:snapshot:result', id: id, error: 'snapshot image failed' }, '*');
+    };
+    img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg);
+  }
+  window.addEventListener('message', function(ev){
+    var data = ev && ev.data;
+    if (!data || data.type !== 'od:snapshot' || !data.id) return;
+    waitForImages().then(function(){ renderSnapshot(String(data.id)); });
+  });
+})();</script><script data-od-srcdoc-transport-activation="">(function(){
+  window.addEventListener('message', function(ev){
+    var data = ev && ev.data;
+    if (!data || data.type !== 'od:srcdoc-transport-activate' || typeof data.html !== 'string') return;
+    document.open();
+    document.write(data.html);
+    document.close();
+  });
+})();</script></body></html>
